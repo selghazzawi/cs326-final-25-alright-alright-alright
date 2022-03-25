@@ -1,0 +1,69 @@
+.nav-bar {
+  width: 100vw;
+  height: 7vh;
+  background-color: #9696ff;
+}
+
+.main {
+  width: 100vw;
+  height: 93vh;
+  background-color: #ede7fb;
+}
+
+.top {
+  width: 100vw;
+  height: 35vh;
+}
+
+.bottom {
+  width: 100vw;
+  height: 58vh;
+}
+
+.nav-parts {
+  width: auto;
+}
+
+.login-button {
+  height: 60%;
+  width: 80px;
+}
+
+.interests {
+  height: 90%;
+  width: 15%;
+  background-color: #c2c2ff;
+}
+
+.general-analysis {
+  height: 90%;
+  width: 38.69%;
+  background-color: #c2c2ff;
+}
+
+.tweet-day {
+  height: 90%;
+  width: 32.1999%;
+  background-color: #c2c2ff;
+}
+
+.trending {
+  height: 90%;
+  width: 15%;
+  background-color: #c2c2ff;
+}
+
+.analysis {
+  height: 90%;
+  width: 75%;
+  background-color: #c2c2ff;
+}
+
+.inner-box {
+  height: 80%;
+  width: 90%;
+  background-color: #ddddff;
+  border-radius: 5px;
+  margin: auto;
+  margin-top: 10px;
+}

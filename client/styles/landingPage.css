@@ -24,9 +24,16 @@
   width: auto;
 }
 
+.search {
+  width: 300px;
+}
+
 .login-button {
   height: 60%;
   width: 80px;
+  background-color: #6e6ea5;
+  border: none;
+  border-radius: 25px;
 }
 
 .interests {
@@ -59,8 +66,42 @@
   background-color: #c2c2ff;
 }
 
-.inner-box {
+.inner-box-wide {
   height: 80%;
+  width: 90%;
+  height: 80%;
+  width: 90%;
+  background-color: #ddddff;
+  border-radius: 5px;
+  margin: auto;
+  margin-top: 10px;
+}
+
+.inner-box-long {
+  height: 88%;
+  width: 90%;
+  background-color: #ddddff;
+  border-radius: 5px;
+  margin: auto;
+  margin-top: 10px;
+}
+
+.analysis-container {
+  width: 100%;
+  height: 95%;
+}
+
+.analysis-small {
+  height: 40%;
+  width: 90%;
+  background-color: #ddddff;
+  border-radius: 5px;
+  margin: auto;
+  margin-top: 10px;
+}
+
+.analysis-big {
+  height: 90%;
   width: 90%;
   background-color: #ddddff;
   border-radius: 5px;

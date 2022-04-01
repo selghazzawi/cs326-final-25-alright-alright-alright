@@ -4,6 +4,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+        <script type="module" src="landingPageLogOut.js" defer></script>
+
     <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="../styles/landingPage.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -23,21 +25,28 @@
             <div class="top d-flex justify-content-around align-items-center">
                 <div class="interests">
                     Your Top 3 Interests
-                    <div class="inner-box-wide"></div>
+                    <div class="inner-box-wide" id="interest-box"></div>
                 </div>
                 <div class="general-analysis">
                     General analysis of all trending
                     <div class="inner-box-wide"></div>
                 </div>
                 <div class="tweet-day">
-                    Tweet of the day: 
-                    <div class="inner-box-wide"></div>
+                    Poppin Tweet: 
+                    <div id="tweet-box">
+                        <div id="handle-row" class="d-flex pl-1">
+                            <div id="name" class="mr-1"></div>
+                            <div id="handle"></div>
+                        </div>
+                        <div id="tweet-text" class="pl-1"></div>
+                        <div id="tweet-img" class="m-auto"></div>
+                    </div>
                 </div>
             </div>
             <div class="bottom d-flex justify-content-around align-items-center">
                 <div class="trending">
                     top 10 trending
-                    <div class="inner-box-long"></div>
+                    <div class="inner-box-long" id="top-trending"></div>
                 </div>
                 <div class="analysis">
                     Analysis

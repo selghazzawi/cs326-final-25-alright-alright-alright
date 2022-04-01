@@ -75,6 +75,9 @@
   border-radius: 5px;
   margin: auto;
   margin-top: 10px;
+  padding-top: 2px;
+  overflow: hidden;
+  overflow-y: scroll;
 }
 
 .inner-box-long {
@@ -84,6 +87,9 @@
   border-radius: 5px;
   margin: auto;
   margin-top: 10px;
+  padding-top: 2px;
+  overflow: hidden;
+  overflow-y: scroll;
 }
 
 .analysis-container {
@@ -107,4 +113,53 @@
   border-radius: 5px;
   margin: auto;
   margin-top: 10px;
+}
+
+.trending-tag {
+  margin: 5px 5px 5px 5px;
+  font-size: 19px;
+  overflow: hidden;
+  border-top: 1px solid rgb(56, 1, 100);
+  border-bottom: 1px solid rgb(56, 1, 100);
+  color: rgb(33, 0, 83);
+}
+
+.interest-tag {
+  margin: 5px 5px 5px 5px;
+  font-size: 28.7px;
+  overflow: hidden;
+  border-top: 1px solid rgb(56, 1, 100);
+  border-bottom: 1px solid rgb(56, 1, 100);
+  color: rgb(33, 0, 83);
+}
+
+#tweet-box {
+  background-color: white;
+  opacity: 80%;
+  height: 85%;
+  width: 96%;
+  border-radius: 5px;
+  margin: auto;
+  overflow: hidden;
+  overflow-y: scroll;
+}
+
+#name {
+  font-weight: bold;
+}
+
+#handle {
+  font-weight: 100;
+}
+
+#tweet-img {
+  width: 95%;
+  border: 1px solid gray;
+  border-radius: 5px;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
 }

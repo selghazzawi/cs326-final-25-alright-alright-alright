@@ -3,11 +3,13 @@ import logger from 'morgan';
 import { readFile, writeFile } from 'fs/promises';
 
 //'https://jsonplaceholder.typicode.com/todos/1'
-const fakeData = 'fakeData.json';
+const fakeTrendingData = 'fakeTrendingData.json';
+const fakeInterestData = 'fakeInterestData.json';
 
 let theGist = {};
+let interest = {}
 
-async function reload(filename) {
+async function reloadTrending(filename) {
     try {
         const data = await readFile(filename, { encoding: 'utf8' });
         theGist = JSON.parse(data);
@@ -16,49 +18,106 @@ async function reload(filename) {
     }
 }
 
-async function saveTopic() {
+async function reloadInterest(filename) {
+    try {
+        const data = await readFile(filename, { encoding: 'utf8' });
+        interest = JSON.parse(data);
+    } catch (err) {
+        interest = {};
+    }
+}
+
+async function saveTrendingTopic() {
     try {
         const data = JSON.stringify(theGist);
-        await writeFile(fakeData, data, { encoding: 'utf8' });
+        await writeFile(fakeTrendingData, data, { encoding: 'utf8' });
     }
     catch (err) {
         console.log(err)
     }
 }
 
-function topicExists(name) {
+async function saveInterestTopic() {
+    try {
+        const data = JSON.stringify(interest);
+        await writeFile(fakeInterestData, data, { encoding: 'utf8' });
+    }
+    catch (err) {
+        console.log(err)
+    }
+}
+
+function trendingTopicExists(name) {
     return name in theGist;
 }
 
- function getID() {
+function interestTopicExists(name) {
+    return name in interest;
+}
+
+ function getTrendingID() {
+     console.log(theGist)
+    if (Object.keys(theGist).length === 0) {return 1}
     return theGist[Object.keys(theGist)[Object.keys(theGist).length - 1]]["id"] + 1;
 }
 
-async function createTopic(response, name) {
+function getInterestID() {
+   if (Object.keys(interest).length === 0) {return 1}
+   return interest[Object.keys(interest)[Object.keys(interest).length - 1]]["id"] + 1;
+}
+
+async function createTrendingTopic(response, name) {
     if (name === undefined) {
         // 400 - Bad Request
         response.status(400).json({ error: 'Topic name is required' });
+    } else if (trendingTopicExists(name)) {
+        response.status(400).json({ error: 'Topic already exists' });
     } else {
-        await reload(fakeData);
+        await reloadTrending(fakeTrendingData);
         console.log(name);
         console.log(theGist);
         theGist[name] = {   
-            "id": getID(),
+            "id": getTrendingID(),
             "topic": name,
             "Anal": "I love " + name,
-            "image": "https://picsum.photos/200/300",
+            "image1": "https://picsum.photos/200/300",
+            "image2": "https://picsum.photos/200/300",
+            "image3": "https://picsum.photos/200/300",
             "Metadata": {}
         };
         console.log(theGist[name]);
-        await saveTopic();
+        await saveTrendingTopic();
         response.json({ topic: name, value: theGist[name] });
     
     }
 }
 
-async function readTopic(response, name) {
-    await reload(fakeData);
-    if (topicExists(name)) {
+async function createInterestTopic(response, name) {
+    if (name === undefined) {
+        // 400 - Bad Request
+        response.status(400).json({ error: 'Topic name is required' });
+    } else if (name in interest) {
+        response.status(400).json({ error: 'Topic already exists' });
+    } else {
+        await reloadInterest(fakeInterestData);
+        interest[name] = {   
+            "id": getInterestID(),
+            "topic": name,
+            "Anal": "I love " + name,
+            "image1": "https://picsum.photos/200/300",
+            "image2": "https://picsum.photos/200/300",
+            "image3": "https://picsum.photos/200/300",
+            "Metadata": {}
+        };
+        await saveInterestTopic();
+        response.json({ topic: name, value: interest[name] });
+    
+    }
+}
+
+async function readTrendingTopic(response, name) {
+    await reloadTrending(fakeTrendingData);
+    if (trendingTopicExists(name)) {
         response.json({ topic: name, value: theGist[name] });
     } else {
         // 404 - Not Found
@@ -66,22 +125,42 @@ async function readTopic(response, name) {
     }
 }
 
-async function updateTopic(response, name, analysis) {
-    if (topicExists(name)) {
+async function readInterestTopic(response, name) {
+    await reloadInterest(fakeInterestData);
+    if (interestTopicExists(name)) {
+        response.json({ topic: name, value: interest[name] });
+    } else {
+        // 404 - Not Found
+        response.json({ error: `Topic '${name}' Not Found` });
+    }
+}
+
+async function updateTrendingTopic(response, name, analysis) {
+    if (trendingTopicExists(name)) {
         theGist[name]["Anal"] = analysis;
-        await saveTopic();
+        await saveTrendingTopic();
         response.json({ topic: name, value: theGist[name] });
     } else {
         // 404 - Not Found
         response.json({ error: `Topic '${name}' Not Found` });
-    }
-    
+    } 
 }
 
-async function deleteTopic(response, name) {
-    if (topicExists(name)) {
+async function updateInterestTopic(response, name, analysis) {
+    if (interestTopicExists(name)) {
+        interest[name]["Anal"] = analysis;
+        await saveInterestTopic();
+        response.json({ topic: name, value: interest[name] });
+    } else {
+        // 404 - Not Found
+        response.json({ error: `Topic '${name}' Not Found` });
+    } 
+}
+
+async function deleteTrendingTopic(response, name) {
+    if (trendingTopicExists(name)) {
         delete theGist[name];
-        await saveTopic();
+        await saveTrendingTopic();
         response.json({ topic: name, value: theGist[name] });
     } else {
         // 404 - Not Found
@@ -89,9 +168,25 @@ async function deleteTopic(response, name) {
     }
 }
 
-async function dumpTopics(response) {
-    await reload(fakeData);
+async function deleteInterestTopic(response, name) {
+    if (interestTopicExists(name)) {
+        delete interest[name];
+        await saveInterestTopic();
+        response.json({ topic: name, value: interest[name] });
+    } else {
+        // 404 - Not Found
+        response.json({ error: `Topic '${name}' Not Found` });
+    }
+}
+
+async function dumpTrendingTopics(response) {
+    await reloadTrending(fakeTrendingData);
     response.json(theGist);
+}
+
+async function dumpInterestTopics(response) {
+    await reloadInterest(fakeInterestData);
+    response.json(interest);
 }
 
 const app = express();
@@ -107,30 +202,55 @@ app.use(express.static('../client'));
 
 //
 
-app.post('/create', async (request, response) => {
+app.post('/createTrending', async (request, response) => {
     const options = request.body;
-    createTopic(response, options.name);
+    createTrendingTopic(response, options.name);
 });
 
-app.get('/read', async (request, response) => {
-    const options = request.query;
-    readTopic(response, options.name);
-});
-
-app.put('/update', async (request, response) => {
-    const options = request.query;
-    updateTopic(response, options.name, options.analysis);
-});
-
-app.delete('/delete', async (request, response) => {
-    const options = request.query;
-    deleteTopic(response, options.name);
-});
-
-
-app.get('/dump', async (request, response) => {
+app.post('/createInterest', async (request, response) => {
     const options = request.body;
-    dumpTopics(response);
+    createInterestTopic(response, options.name);
+});
+
+app.get('/readTrending', async (request, response) => {
+    const options = request.query;
+    readTrendingTopic(response, options.name);
+});
+
+app.get('/readInterest', async (request, response) => {
+    const options = request.query;
+    readInterestTopic(response, options.name);
+});
+
+app.put('/updateTrending', async (request, response) => {
+    const options = request.query;
+    updateTrendingTopic(response, options.name, options.analysis);
+});
+
+app.put('/updateInterest', async (request, response) => {
+    const options = request.query;
+    updateInterestTopic(response, options.name, options.analysis);
+});
+
+app.delete('/deleteTrending', async (request, response) => {
+    const options = request.query;
+    deleteTrendingTopic(response, options.name);
+});
+
+app.delete('/deleteInterest', async (request, response) => {
+    const options = request.query;
+    deleteInterestTopic(response, options.name);
+});
+
+
+app.get('/dumpTrending', async (request, response) => {
+    const options = request.body;
+    dumpTrendingTopics(response);
+});
+
+app.get('/dumpInterest', async (request, response) => {
+    const options = request.body;
+    dumpInterestTopics(response);
 });
 
 /*app.get('*', async (request, response) => {

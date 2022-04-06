@@ -5,45 +5,84 @@ import * as crud from './crud.js';
 const nameText = document.getElementById('name');
 const analysisText = document.getElementById('analysis');
 const ageText = document.getElementById('age');
-const createButton = document.getElementById('create');
-const readButton = document.getElementById('read');
-const updateButton = document.getElementById('update');
-const deleteButton = document.getElementById('delete');
+const createTrendingButton = document.getElementById('create-trending');
+const readTrendingButton = document.getElementById('read-trending');
+const updateTrendingButton = document.getElementById('update-trending');
+const deleteTrendingButton = document.getElementById('delete-trending');
+const createInterestButton = document.getElementById('create-interest');
+const readInterestButton = document.getElementById('read-interest');
+const updateInterestButton = document.getElementById('update-interest');
+const deleteInterestButton = document.getElementById('delete-interest');
 const output = document.getElementById('output');
 const all = document.getElementById('all');
 
-async function allTopics() {
-  const json = await crud.readAllTopics();
+async function allTrendingTopics() {
+  const json = await crud.readAllTrendingTopics();
   all.innerHTML = JSON.stringify(json);
 }
 
-createButton.addEventListener('click', async (e) => {
+async function allInterestTopics() {
+  const json = await crud.readAllInterestTopics();
+  all.innerHTML = JSON.stringify(json);
+}
+
+createTrendingButton.addEventListener('click', async (e) => {
   const name = nameText.value;
-  const json = await crud.createTopic(name);
+  const json = await crud.createTrendingTopic(name);
   output.innerHTML = JSON.stringify(json);
-  await allTopics();
+  await allTrendingTopics();
 });
 
-readButton.addEventListener('click', async (e) => {
+createInterestButton.addEventListener('click', async (e) => {
   const name = nameText.value;
-  const json = await crud.readTopic(name);
+  const json = await crud.createInterestTopic(name);
   output.innerHTML = JSON.stringify(json);
-  await allTopics();
+  await allInterestTopics();
 });
 
-updateButton.addEventListener('click', async (e) => {
+readTrendingButton.addEventListener('click', async (e) => {
+  const name = nameText.value;
+  const json = await crud.readTrendingTopic(name);
+  output.innerHTML = JSON.stringify(json);
+  await allTrendingTopics();
+});
+
+readInterestButton.addEventListener('click', async (e) => {
+  console.log('butt')
+  const name = nameText.value;
+  const json = await crud.readInterestTopic(name);
+  output.innerHTML = JSON.stringify(json);
+  await allInterestTopics();
+});
+
+updateTrendingButton.addEventListener('click', async (e) => {
   const name = nameText.value;
   const analysis = analysisText.value;
-  const json = await crud.updateTopic(name, analysis);
+  const json = await crud.updateTrendingTopic(name, analysis);
   output.innerHTML = JSON.stringify(json);
-  await allTopics();
+  await allTrendingTopics();
 });
 
-deleteButton.addEventListener('click', async (e) => {
+updateInterestButton.addEventListener('click', async (e) => {
   const name = nameText.value;
-  const json = await crud.deleteTopic(name);
+  const analysis = analysisText.value;
+  const json = await crud.updateInterestTopic(name, analysis);
   output.innerHTML = JSON.stringify(json);
-  await allTopics();
+  await allInterestTopics();
 });
 
-allTopics();
+deleteTrendingButton.addEventListener('click', async (e) => {
+  const name = nameText.value;
+  const json = await crud.deleteTrendingTopic(name);
+  output.innerHTML = JSON.stringify(json);
+  await allTrendingTopics();
+});
+
+deleteInterestButton.addEventListener('click', async (e) => {
+  const name = nameText.value;
+  const json = await crud.deleteInterestTopic(name);
+  output.innerHTML = JSON.stringify(json);
+  await allTrendingTopics();
+});
+
+//allTopics();

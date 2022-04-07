@@ -104,6 +104,7 @@
   border-radius: 5px;
   margin: auto;
   margin-top: 10px;
+  overflow: hidden;
 }
 
 .analysis-big {

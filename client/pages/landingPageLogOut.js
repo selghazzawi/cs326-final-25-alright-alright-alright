@@ -1,8 +1,9 @@
+import * as crud from '../crud.js';
 const trendingBox = document.getElementById('top-trending')
 const interestBox = document.getElementById('interest-box')
-const trendingArr = ['Bruce Willis', '#TrumpCoverUp', 'Tyga', '#discorddown', '#PMSHappyBirthdayTone',
-                     'Patrick Peterson', 'Cawthorn', '5sos', 'Hunter Biden', '#AsItWas']
-const interestArr = ['Celtics', 'Kung Fu Panda', 'Chuck Norris']
+const analysisBox1 = document.getElementById('analysis-1')
+const analysisBox2 = document.getElementById('analysis-2')
+const analysisBox3 = document.getElementById('analysis-3')
 
 const tweet = {
     user_name: 'Dave Quinn',
@@ -11,27 +12,46 @@ const tweet = {
     img: 'https://pbs.twimg.com/media/FPHBEr7WQAMw07L?format=jpg&name=900x900'
 }
 
-
-function populateTrending() {
-    // while (trendingBox.firstChild) {
-    //     trendingBox.removeChild(trendingBox.lastChild);
-    //   }
-
-    trendingArr.forEach((tag) => {
-        const newDiv = document.createElement('div');
-        newDiv.innerHTML = tag;
-        newDiv.classList.add('trending-tag');
-        trendingBox.appendChild(newDiv);
-    })
+async function populateTrending() {
+    while (trendingBox.firstChild) {
+        trendingBox.removeChild(trendingBox.lastChild);
+      }
+    const json = await crud.readAllTrendingTopics();
+    let check = 0;
+    for (const key in json) {
+        if (check < 10) {
+            const newDiv = document.createElement('div');
+            newDiv.innerHTML = json[key].topic;
+            newDiv.classList.add('trending-tag');
+            newDiv.onclick = function() {displayNewAnalysis(json[key])};
+            trendingBox.appendChild(newDiv);
+            check += 1
+            if (json[key].id === 1) {
+                initialAnalysis(json[key]);
+            }
+        }
+        else break;
+    }
+    
 }
 
-function populateInterests() {
-    interestArr.forEach((tag) => {
-        const newDiv = document.createElement('div');
-        newDiv.innerHTML = tag;
-        newDiv.classList.add('interest-tag');
-        interestBox.appendChild(newDiv);
-    })
+async function populateInterests() {
+    while (interestBox.firstChild) {
+        interestBox.removeChild(trendingBox.lastChild);
+      }
+    const json = await crud.readAllInterestTopics();
+    console.log(json)
+    let check = 0;
+    for (const key in json) {
+        if (check < 10) {
+            const newDiv = document.createElement('div');
+            newDiv.innerHTML = json[key].topic;
+            newDiv.classList.add('interest-tag');
+            interestBox.appendChild(newDiv);
+            check += 1
+        }
+        else break;
+    }
 }
 
 function populateTweet() {
@@ -46,6 +66,19 @@ function populateTweet() {
     img.innerHTML = "<img id='img' src='" + tweet.img + "' alt='Bruce-Willis picture'></img>"
 }
 
+function initialAnalysis(obj) {
+    analysisBox1.innerHTML = "<img src='" + obj.image1 + "' alt='image1'>"
+    analysisBox2.innerHTML = "<img src='" + obj.image2 + "' alt='image2'>"
+    analysisBox3.innerHTML = "<img src='" + obj.image3 + "' alt='image3'>"
+}
+
+function displayNewAnalysis(obj) {
+    console.log('butt')
+    analysisBox1.innerHTML = "<img src='" + obj.image1 + "' alt='image1'>"
+    analysisBox2.innerHTML = "<img src='" + obj.image2 + "' alt='image2'>"
+    analysisBox3.innerHTML = "<img src='" + obj.image3 + "' alt='image3'>"
+}
+// getAllTrendingTweets()
 populateTrending();
 populateInterests();
 populateTweet();

@@ -1,6 +1,6 @@
 //ONLY USED AS A TEMP FILE FOR NOW TO RUN SERVER.JS
 
-import * as crud from './crud.js';
+import * as crud from '../../crud.js';
 
 const nameText = document.getElementById('name');
 const analysisText = document.getElementById('analysis');

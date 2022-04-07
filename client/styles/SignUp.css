@@ -1,0 +1,27 @@
+.gradient-custom-3 {
+    /* fallback for old browsers */
+    background:#c2ffff;
+  
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: -webkit-linear-gradient(to right, #c2c2ff,#c2ffff);
+  
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: linear-gradient(to right, #c2c2ff, #c2ffff)
+  }
+  .gradient-custom-4 {
+    /* fallback for old browsers */
+    background: #c2ffff
+    ;
+  
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: -webkit-linear-gradient(to right, #c2c2ff, #c2ffff);
+  
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: linear-gradient(to right, #c2c2ff, #c2ffff)
+  }
+
+  /* #c2c2ff
+#8892b3
+#d6c2ff
+#c2ffff
+#88b3b3 */

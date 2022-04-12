@@ -4,6 +4,8 @@ const interestBox = document.getElementById('interest-box')
 const analysisBox1 = document.getElementById('analysis-1')
 const analysisBox2 = document.getElementById('analysis-2')
 const analysisBox3 = document.getElementById('analysis-3')
+const searchBar = document.getElementById('search-bar')
+const submitButton = document.getElementById('submit-button')
 
 const tweet = {
     user_name: 'Dave Quinn',
@@ -37,7 +39,7 @@ async function populateTrending() {
 
 async function populateInterests() {
     while (interestBox.firstChild) {
-        interestBox.removeChild(trendingBox.lastChild);
+        interestBox.removeChild(interestBox.lastChild);
       }
     const json = await crud.readAllInterestTopics();
     console.log(json)
@@ -45,7 +47,15 @@ async function populateInterests() {
     for (const key in json) {
         if (check < 10) {
             const newDiv = document.createElement('div');
-            newDiv.innerHTML = json[key].topic;
+            const text = document.createElement('div');
+            const x = document.createElement('div');
+            x.innerHTML = 'x'
+            x.onclick = function() {deleteInterest(text.innerHTML)}
+            text.innerHTML = json[key].topic;
+            newDiv.appendChild(text)
+            newDiv.appendChild(x)
+            newDiv.style.display = 'flex'
+            newDiv.style.justifyContent = 'space-between'
             newDiv.classList.add('interest-tag');
             interestBox.appendChild(newDiv);
             check += 1
@@ -78,6 +88,20 @@ function displayNewAnalysis(obj) {
     analysisBox2.innerHTML = "<img src='" + obj.image2 + "' alt='image2'>"
     analysisBox3.innerHTML = "<img src='" + obj.image3 + "' alt='image3'>"
 }
+
+async function deleteInterest(name) {
+    console.log('ligma')
+    await crud.deleteInterestTopic(name)
+    populateInterests();
+}
+
+submitButton.addEventListener('click', async function() {
+    const data = await crud.createInterestTopic(searchBar.value)
+    console.log(data)
+    populateInterests()
+})
+
+
 // getAllTrendingTweets()
 populateTrending();
 populateInterests();

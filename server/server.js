@@ -67,51 +67,58 @@ function getInterestID() {
 }
 
 async function createTrendingTopic(response, name) {
-    if (name === undefined) {
+    await reloadTrending(fakeTrendingData);
+    if (name === undefined || name === '') {
         // 400 - Bad Request
         response.status(400).json({ error: 'Topic name is required' });
     } else if (trendingTopicExists(name)) {
         response.status(400).json({ error: 'Topic already exists' });
     } else {
-        await reloadTrending(fakeTrendingData);
-        console.log(name);
-        console.log(theGist);
-        theGist[name] = {   
-            "id": getTrendingID(),
-            "topic": name,
-            "Anal": "I love " + name,
-            "image1": "https://picsum.photos/200/300",
-            "image2": "https://picsum.photos/200/300",
-            "image3": "https://picsum.photos/200/300",
-            "Metadata": {}
-        };
-        console.log(theGist[name]);
-        await saveTrendingTopic();
-        response.json({ topic: name, value: theGist[name] });
-    
+        if (Object.keys(theGist).length < 10) {
+            console.log(name);
+            console.log(theGist);
+            theGist[name] = {   
+                "id": getTrendingID(),
+                "topic": name,
+                "Anal": "I love " + name,
+                "image1": "https://picsum.photos/200/300",
+                "image2": "https://picsum.photos/200/300",
+                "image3": "https://picsum.photos/200/300",
+                "Metadata": {}
+            };
+            console.log(theGist[name]);
+            await saveTrendingTopic();
+            response.json({ topic: name, value: theGist[name] });   
+        } else {
+            response.status(400).json({ error: 'Too many topics' });
+        }
     }
 }
 
 async function createInterestTopic(response, name) {
-    if (name === undefined) {
+    await reloadInterest(fakeInterestData);
+    if (name === undefined || name === '') {
         // 400 - Bad Request
         response.status(400).json({ error: 'Topic name is required' });
-    } else if (name in interest) {
+    } else if (interestTopicExists(name)) {
         response.status(400).json({ error: 'Topic already exists' });
     } else {
-        await reloadInterest(fakeInterestData);
-        interest[name] = {   
-            "id": getInterestID(),
-            "topic": name,
-            "Anal": "I love " + name,
-            "image1": "https://picsum.photos/200/300",
-            "image2": "https://picsum.photos/200/300",
-            "image3": "https://picsum.photos/200/300",
-            "Metadata": {}
-        };
-        await saveInterestTopic();
-        response.json({ topic: name, value: interest[name] });
-    
+        console.log(Object.keys(interest))
+        if (Object.keys(interest).length < 3) {
+            interest[name] = {   
+                "id": getInterestID(),
+                "topic": name,
+                "Anal": "I love " + name,
+                "image1": "https://picsum.photos/200/300",
+                "image2": "https://picsum.photos/200/300",
+                "image3": "https://picsum.photos/200/300",
+                "Metadata": {}
+            };
+            await saveInterestTopic();
+            response.json({ topic: name, value: interest[name] });
+        } else {
+            response.status(400).json({ error: 'Too many topics' });
+        } 
     }
 }
 
@@ -158,6 +165,7 @@ async function updateInterestTopic(response, name, analysis) {
 }
 
 async function deleteTrendingTopic(response, name) {
+    await reloadTrending(fakeTrendingData);
     if (trendingTopicExists(name)) {
         delete theGist[name];
         await saveTrendingTopic();
@@ -169,7 +177,10 @@ async function deleteTrendingTopic(response, name) {
 }
 
 async function deleteInterestTopic(response, name) {
+    await reloadInterest(fakeInterestData);
+    console.log(name)
     if (interestTopicExists(name)) {
+        console.log('hi')
         delete interest[name];
         await saveInterestTopic();
         response.json({ topic: name, value: interest[name] });

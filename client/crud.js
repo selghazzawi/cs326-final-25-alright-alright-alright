@@ -90,6 +90,7 @@ export async function createTrendingTopic(name) {
 
   export async function deleteInterestTopic(name) {
     try {
+      console.log('bill')
       const response = await fetch(`/deleteInterest?name=${name}`, {
         method: 'DELETE',
       });

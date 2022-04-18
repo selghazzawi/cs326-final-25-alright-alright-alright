@@ -1,0 +1,27 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Backend Server",
+  "main": "server.js",
+  "type": "module",
+  "engines": {
+    "node":"16.14.0"
+  },
+  "scripts": {
+    "deploy": "copyfiles client/* server/* .env package*.json deploy",
+    "start": "node server/index.js",
+    "debug": "node --inspect-brk index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.3",
+    "morgan": "^1.10.0",
+    "pg": "^8.7.3",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1"
+  }  
+}
+

@@ -3,8 +3,8 @@ import logger from 'morgan';
 import { readFile, writeFile } from 'fs/promises';
 
 //'https://jsonplaceholder.typicode.com/todos/1'
-const fakeTrendingData = 'fakeTrendingData.json';
-const fakeInterestData = 'fakeInterestData.json';
+const fakeTrendingData = 'server/fakeTrendingData.json';
+const fakeInterestData = 'server/fakeInterestData.json';
 
 let theGist = {};
 let interest = {}
@@ -209,7 +209,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use(express.static('../client/'));
+app.use('/client', express.static('client'));
 
 //
 

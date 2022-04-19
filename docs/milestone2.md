@@ -33,21 +33,21 @@
 
 ### Update
 This area represent the analysis of a specific trending topic which will be updated throughout the day as Twitter data is processed. The analysis will be composed of graphs with sentiment analysis and keyword analysis. The images shown here are placeholders.
-![Update](./images/Screen%20Shot%202022-04-19%20at%201.35.34%20PM.png)
+![Update](./Screen%20Shot%202022-04-19%20at%201.35.34%20PM.png)
 
 ### Create
 Here a user can type in an interest query to and hit submit to add to their limited list of interests for analysis.
-![Create](./images/Screen%20Shot%202022-04-19%20at%201.36.15%20PM.png)
+![Create](./Screen%20Shot%202022-04-19%20at%201.36.15%20PM.png)
 
 ### Read
 Here we read from the database to gather the list of trending topics and when clicked, the corresponding analysis would be shown in the analysis area of the page.
 
-![Read](./images/Screen%20Shot%202022-04-19%20at%201.36.34%20PM.png)
+![Read](./Screen%20Shot%202022-04-19%20at%201.36.34%20PM.png)
 
 ### Delete
 Here a user can click on the 'x' to delete a topic from their 3 interests.
 
-![Delete](./images/Screen%20Shot%202022-04-19%20at%201.38.54%20PM.png)
+![Delete](./Screen%20Shot%202022-04-19%20at%201.38.54%20PM.png)
 
 ---
 ## Link to project

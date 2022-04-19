@@ -59,6 +59,11 @@ Here a user can click on the 'x' to delete a topic from their 3 interests.
 ---
 
 ## Link to project
+First link is to the app, second is for the landing page.
+
+https://cs326-final-25-alright-alright.herokuapp.com
+
+https://cs326-final-25-alright-alright.herokuapp.com/client/pages/landingPageLogOut/
 
 ## Division of Labor
 

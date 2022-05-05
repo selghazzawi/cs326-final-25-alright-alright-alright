@@ -3,6 +3,10 @@ import logger from 'morgan';
 import { readFile, writeFile } from 'fs/promises';
 import { MongoClient } from 'mongodb';
 import 'dotenv/config';
+import { spawn } from 'child_process';
+import mongoose from 'mongoose';
+import { TheGistDatabase } from './db.js';
+import { createSecureServer } from 'http2';
 
 //'https://jsonplaceholder.typicode.com/todos/1'
 const fakeTrendingData = 'server/fakeTrendingData.json';
@@ -232,6 +236,9 @@ async function main() {
     const app = express();
     const port = 3000;
     
+    const db = new TheGistDatabase(uri);
+    await db.connect();
+
     app.use(logger('dev'));
     
     // NEW: Add json and urlencoded middleware
@@ -241,26 +248,88 @@ async function main() {
     app.use('/client', express.static('client'));
     
     //
+    //USER ROUTES START\
+    app.post('/createUser', async (request, response) => {
+        const options = request.body;
+        await db.InsertUser(options.email, options.password);
+        response.status(200).send('success');
+    });
+
+    app.get('/checkUserLogin', async (request, response) => {
+        const options = request.query;
+        const res = await db.getUser(options.email);
+        if (res[0].password === options.password) {
+            res.status(200).send('successful login');
+        }
+        else {
+            res.status(500).send('incorrect info');
+        }
+    });
+
+
+    //USER ROUTES END
+    
+    //INTEREST ROUTES
+    app.get('/readInterest', async (request, response) => {
+        const options = request.query;
+        const res = await db.getUser(options.email);
+        const uid = res[0]._id;
+        const rows = await db.readInterestsbyId(uid);
+        response.send(rows);
+    });
+
+    app.post('/createInterest', async (request, response) => {
+        const options = request.body;
+        //uid interest i1/2/3
+        const res = await db.getUser(options.email);
+        const uid = res[0]._id;
+        const rows = await db.readInterestsbyId(uid);
+        if (rows.length >= 3) {
+            response.status(500).send(`Max interests: ${rows.length} `);
+        }
+        //RUN PYTHON SCRIPT
+        //await db.InsertInterest(uid, pythonData.interest, pythonData.image1, pythonData.image2, pythonData.image3)
+        response.status(200).send('success');
+    });
+    //
+    //TRENDING ROUTES
+    app.get('/readTrending', async (request, response) => {
+        const options = request.query;
+        const rows = await db.dumpTrendingTopics();
+        response.send(rows);
+    });
+
+    app.post('/createTrendingTopic', async (request, response) => {
+        const options = request.body;
+        //RUN PYTHON SCRIPT
+        //Iterate through array of 10 trending from Ez's data and inster Topic per.
+        //await db.InsertTrendingTopic
+        response.status(200).send('success');
+    });
+    //
+    //TODO: Tweet of the Day Routes
+    //GEN TRENDING ROUTES
+    app.get('/readTrendingAnalysis', async (request, response) => {
+        const options = request.query;
+        const rows = await db.readTrendingAnalysis();
+        response.send(rows);
+    });
+    app.post('/createTrendingAnalysis', async (request, response) => {
+        const options = request.body;
+        //RUN PYTHON SCRIPT
+        //PUSH single analysis
+        //await db.insertTrendingAnalysis(pythonData.analysis)
+        response.status(200).send('success');
+    });
+
+    // ----------------------------------------------------------------routes below are gonna get deleted eventually
     
     app.post('/createTrending', async (request, response) => {
         const options = request.body;
         createTrendingTopic(response, options.name);
     });
     
-    app.post('/createInterest', async (request, response) => {
-        const options = request.body;
-        createInterestTopic(response, options.name);
-    });
     
-    app.get('/readTrending', async (request, response) => {
-        const options = request.query;
-        readTrendingTopic(response, options.name);
-    });
-    
-    app.get('/readInterest', async (request, response) => {
-        const options = request.query;
-        readInterestTopic(response, options.name);
-    });
     
     app.put('/updateTrending', async (request, response) => {
         const options = request.query;
@@ -294,36 +363,20 @@ async function main() {
     });
 
     const uri = process.env.MONGODB_URI;
-    console.log(uri)
-    const client = new MongoClient(uri);
+    //console.log(uri)
+    //const client = new MongoClient(uri);
     try {
+        /*const client = new TheGistDatabase(uri);
         await client.connect();
-        const dbo = client.db('mydb');
-        console.log(dbo);
-        const curCollection = dbo.collection('temp');
-        console.log(curCollection);
-        curCollection.insertOne( { item: "card", qty: 15 } );
-        /*dbo.createCollection('temp', function(err, res) {
-            if (err) throw err;
-            console.log("Collection created!");
-            dbo.close();
-          });*/
-        /*client.db.createCollection("temp", function(err, res) {
-            if (err) throw err;
-            console.log("Collection created!");
-            db.close();
-          });*/
-        await  listDatabases(client);
-        //await createCollection(client);
-        //await listDatabases(client);
+        await client.InsertInterest(1,'celtics', 'i1', 'i2', 'i3', 'meta');
+        console.log(await client.readInterestsbyId(1));
+        */
+
+
     }
     catch (e) {
         console.error(e);
     }
-    finally {
-        await client.close();
-    }
-
     app.listen(port, () => {
         console.log(`Server started on port ${port}`);
       });

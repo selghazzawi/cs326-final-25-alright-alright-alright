@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ServerApiVersion } from 'mongodb';
 
 export class TheGistDatabase {
     constructor(dburl) {
@@ -8,18 +8,27 @@ export class TheGistDatabase {
   
     async connect() {
 
-      this.mongo = new MongoClient(this.dburl);  
+      this.client = await MongoClient.connect(this.dburl, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        serverApi: ServerApiVersion.v1,          
+      });
   
-      // Create the pool.
-      this.client = await this.mongo.connect();
-  
+      await this.init();
       // Init the database.
-      this.db = client.db('theGistMainApp');
-      this.interests = this.db.collection('Interests');
-      this.trendingTopics = this.db.collection('TrendingTopics');
       //await this.init();
       //const queryText = 'TRUNCATE GameScore, WordScore';
       //await this.init(); 
+    }
+    async init() {
+        this.db = this.client.db('theGistMainApp');
+        //console.log(this.db);
+        this.interests = this.db.collection('Interests');
+        //console.log(this.interests);
+        this.trendingTopics = this.db.collection('TrendingTopics');
+        this.users = this.db.collection('Users');
+        this.trendingAnalysis = this.db.collection('TrendingAnalysis');
+        
     }
   
   
@@ -32,17 +41,11 @@ export class TheGistDatabase {
 
     async InsertInterest(uid, interest, image1,image2,image3, metadata) {
         await this.interests.insertOne({'uid': uid, 'interest': interest, 'image1':image1, 'image2':image2, 'image3':image3, 'metadata':metadata});
-        /*
-        Interest:
-        image1:
-        image2:
-        image3:
-        uid:
-        meta*/
+
     }
-    async InsertTrendingTopic(id, topic, image1,image2,image3, metadata) {
+    async InsertTrendingTopic(topic, image1,image2,image3) {
         //TODO
-        await this.trendingTopics.insertOne({'tid': id, 'topic': topic, 'image1':image1, 'image2':image2, 'image3':image3, 'metadata':metadata});
+        await this.trendingTopics.insertOne({'topic': topic, 'image1':image1, 'image2':image2, 'image3':image3});
 
     }
     
@@ -56,8 +59,8 @@ export class TheGistDatabase {
         return res;
     }
 
-    async readTrendingTopicsById(id) {
-        const res = await this.trendingTopics.find({'tid': id}).toArray();
+    async readTrendingTopics(topic) {
+        const res = await this.trendingTopics.find({'topic':topic}).toArray();
         return res;
     }
 
@@ -74,17 +77,59 @@ export class TheGistDatabase {
         this.interests.deleteMany({'uid': uid});
     }
 
-    async deleteTrendingTopic(id, topic) {
-        this.interests.deleteMany({'tid': id, 'topic': topic});
+    async deleteTrendingTopic(topic) {
+        this.trendingTopics.deleteMany({'topic': topic});
     }
 
     async updateInterest(uid, interest, image1,image2,image3, metadata) {
         await this.interests.updateOne({'uid': uid, 'interest': interest}, {$set: {'image1':image1, 'image2':image2, 'image3':image3, 'metadata':metadata}}, {upsert: true});
     } 
 
-    async updateTrendingTopic(id, topic, image1,image2,image3, metadata) {
-        await this.interests.updateOne({'tid': id, 'topic': topic}, {$set: {'image1':image1, 'image2':image2, 'image3':image3, 'metadata':metadata}}, {upsert: true});
-
+    async updateTrendingTopic(topic, image1,image2,image3) {
+        await this.interests.updateOne({'topic': topic}, {$set: {'image1':image1, 'image2':image2, 'image3':image3}}, {upsert: true});
     }
+
+    async deleteAllTrendingTopics() {
+        this.trendingTopics.deleteMany({});
+    }
+
+    async deleteAllTrendingTopics() {
+        this.trendingTopics.deleteMany({});
+    }
+
+    async deleteAllInterestsNoId() {
+        await this.interests.deleteMany({});
+    }
+
+    async getUser(email) {
+        return await this.users.find({'email':email}).toArray();
+    }
+
+    //Insert user
+    async InsertUser(email, pw) {
+        await this.users.insertOne({'email': email, 'password': pw});
+    }
+    //delete user
+    async deleteUser(email) {
+        await this.users.deleteMany({'email': email});        
+    }
+
+    //wipe users
+    async wipeUsers() {
+        await this.users.deleteMany({});        
+    }
+
+    async deleteTrendingAnalysis() {
+        await this.trendingAnalysis.deleteMany({});  
+    }
+
+    async insertTrendingAnalysis(image) {
+        await this.users.insertOne({'image': image});
+    }
+
+    async readTrendingAnalysis() {
+        return await this.users.find({}).toArray();
+    }
+    //TODO: Tweet of the Day Routes
 
   }

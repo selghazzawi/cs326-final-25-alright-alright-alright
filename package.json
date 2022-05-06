@@ -5,7 +5,7 @@
   "main": "server.js",
   "type": "module",
   "engines": {
-    "node":"16.14.0"
+    "node": "16.14.0"
   },
   "scripts": {
     "deploy": "copyfiles ../../client/* ../server/* .env package*.json deploy",
@@ -15,15 +15,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.3",
-    "morgan": "^1.10.0",
-    "mongodb": "^4.5.0",
-    "pg": "^8.7.3",
     "dotenv": "^16.0.0",
-    "nodemon": "^2.0.15"
+    "express": "^4.17.3",
+    "mongodb": "^4.5.0",
+    "mongoose": "^6.3.1",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.15",
+    "pg": "^8.7.3"
   },
   "devDependencies": {
     "copyfiles": "^2.4.1"
-  }  
+  }
 }
-

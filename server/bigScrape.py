@@ -101,7 +101,7 @@ def populateTweets(tweetDict,api, count):
 
     for t in tweets:
         tweetDict['tweets'].append(t.text)
-        tweetDict['sources'].append(t.source)
+        tweetDict['sources'].append(t._json['source'])
     return tweetDict
 
 '''this a big one meat and bones'''

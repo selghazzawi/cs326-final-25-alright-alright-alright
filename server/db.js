@@ -28,6 +28,7 @@ export class TheGistDatabase {
         this.trendingTopics = this.db.collection('TrendingTopics');
         this.users = this.db.collection('Users');
         this.trendingAnalysis = this.db.collection('TrendingAnalysis');
+        this.tod = this.db.collection('tod');
         
     }
   
@@ -39,8 +40,8 @@ export class TheGistDatabase {
       //await this.pool.end();
     }
 
-    async InsertInterest(uid, interest, image1,image2,image3, metadata) {
-        await this.interests.insertOne({'uid': uid, 'interest': interest, 'image1':image1, 'image2':image2, 'image3':image3, 'metadata':metadata});
+    async InsertInterest(uid, interest, image1,image2,image3) {
+        await this.interests.insertOne({'uid': uid, 'interest': interest, 'image1':image1, 'image2':image2, 'image3':image3});
 
     }
     async InsertTrendingTopic(topic, image1,image2,image3) {
@@ -131,5 +132,15 @@ export class TheGistDatabase {
         return await this.users.find({}).toArray();
     }
     //TODO: Tweet of the Day Routes
+    async deleteTOD() {
+        await this.tod.deleteMany({});  
+    }
 
+    async insertTOD(html) {
+        await this.tod.insertOne({'link': html});
+    }
+
+    async readTOD() {
+        return await this.tod.find({}).toArray();
+    }
   }

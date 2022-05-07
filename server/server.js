@@ -4,9 +4,11 @@ import { readFile, writeFile } from 'fs/promises';
 import { MongoClient } from 'mongodb';
 import 'dotenv/config';
 import { spawn } from 'child_process';
+import { PythonShell } from 'python-shell';
 import mongoose from 'mongoose';
 import { TheGistDatabase } from './db.js';
 import { createSecureServer } from 'http2';
+
 
 //'https://jsonplaceholder.typicode.com/todos/1'
 const fakeTrendingData = 'server/fakeTrendingData.json';
@@ -234,8 +236,8 @@ async function listDatabases(client) {
 
 async function main() {
     const app = express();
-    const port = 3000;
-    
+    const port = 8080;
+    const uri = process.env.MONGODB_URI;
     const db = new TheGistDatabase(uri);
     await db.connect();
 
@@ -277,20 +279,88 @@ async function main() {
         const rows = await db.readInterestsbyId(uid);
         response.send(rows);
     });
-
+    let dataToSend;
     app.post('/createInterest', async (request, response) => {
         const options = request.body;
         //uid interest i1/2/3
-        const res = await db.getUser(options.email);
-        const uid = res[0]._id;
-        const rows = await db.readInterestsbyId(uid);
-        if (rows.length >= 3) {
-            response.status(500).send(`Max interests: ${rows.length} `);
-        }
+        //const res = await db.getUser(options.email);
+        // const uid = res[0]._id;
+        // const rows = await db.readInterestsbyId(uid);
+        // if (rows.length >= 3) {
+        //     response.status(500).send(`Max interests: ${rows.length} `);
+        // }
         //RUN PYTHON SCRIPT
+        const python = spawn('python', ['/Users/gregorygarber/Desktop/cs326-final-25-alright-alright-alright/server/test.py']);
+        //console.log(python)
+        // python.stdout.on('data', function (data) {
+        //     console.log('Pipe data from python script ...');
+        //     //console.log(1, data)
+        //     dataToSend = data.toString();
+        //     console.log(dataToSend)
+        //    });
+        //    python.on('close', (code) => {
+        //     console.log(`child process close all stdio with code ${code}`);
+        //     response.send(dataToSend)
+        //     // send data to browser
+        //     });
+
+        PythonShell.run('/Users/gregorygarber/Desktop/cs326-final-25-alright-alright-alright/server/bigScrape.py', null, function(err, results) {
+            if (err) throw err;
+            const res = JSON.parse(results)
+            console.log(res.generalAnalysis);
+            //'generalAnalysis', 'trendingAnalysis', 'userAnalysis', 'TOD'
+        })
         //await db.InsertInterest(uid, pythonData.interest, pythonData.image1, pythonData.image2, pythonData.image3)
-        response.status(200).send('success');
+        //response.status(200).send('success');
     });
+
+    app.post('/createInterestAndTrending', async (req, res) => {
+        //get options from req, check for length
+        //run the script break it down into variables and then delete/update/post to db
+        const options = req.body;
+        const arr = options.args
+        const email = options.email
+        const userRes = await db.getUser(options.email);
+        const id = res[0]._id;
+        let options2 = {
+            mode: 'text',
+            //pythonPath: '/Library/Frameworks/Python.framework/Versions/3.10/bin/python3',
+            pythonOptions: ['-u'], // get print results in real-time
+            scriptPath: '/Users/gregorygarber/Desktop/cs326-final-25-alright-alright-alright/server/',
+            args: [arr[0], arr[1], arr[2]]
+          };
+        PythonShell.run('bigScrape.py', options2, function(err, results) {
+            if (err) throw err;
+            const res = JSON.parse(results)
+            const generalAnalysis = res.generalAnalysis;
+            const trendingAnalysis = res.trendingAnalysis;
+            const userAnalysis = res.userAnalysis;
+            const TOD = res.TOD;
+            //console.log(userAnalysis)
+            console.log(Object.keys(generalAnalysis))
+            //'generalAnalysis', 'trendingAnalysis', 'userAnalysis', 'TOD'
+            
+            await db.deleteAllInterests(id);
+            userAnalysis.forEach(interest => {
+                await db.InsertInterest(id, interest.topic, interest.sentiment, interest.topWords, interest.orgs);
+            })
+
+            await db.deleteAllTrendingTopics();
+            trendingAnalysis.forEach(trending => {
+                await db.InsertTrendingTopic(trending.topic, trending.sentiment, trending.topWords, trending.orgs);
+            })
+
+            await db.deleteTrendingAnalysis()
+            await db.insertTrendingAnalysis(generalAnalysis)
+
+            await db.deleteTOD()
+            await db.insertTOD(TOD)
+            response.status(200).send('success');
+
+           // console.log(1, generalAnalysis, 2, trendingAnalysis, 3, userAnalysis, 4, TOD)
+        })
+        console.log('ligma')
+    })
     //
     //TRENDING ROUTES
     app.get('/readTrending', async (request, response) => {
@@ -361,8 +431,6 @@ async function main() {
         const options = request.body;
         dumpInterestTopics(response);
     });
-
-    const uri = process.env.MONGODB_URI;
     //console.log(uri)
     //const client = new MongoClient(uri);
     try {

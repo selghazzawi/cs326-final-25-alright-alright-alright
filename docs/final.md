@@ -15,6 +15,9 @@
     Ibrahim Syed - Ibrahimmsyed7
     Greg Garber - Gregorygarber
 
+# Local Setup
+ - See the setup.md to run this locally as our .env files are not in the repo.
+
 # User Interface
 
 Logged Out Page - Landing Page of the website, offers logged out users the ability to use the application but with limited features. Logged out users have theability to see the top trending topics, but cannot select any personal interests

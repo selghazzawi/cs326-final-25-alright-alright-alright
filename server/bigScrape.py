@@ -109,6 +109,7 @@ def populateTweets(tweetDict, api, count):
                 "https://twitter.com/{}/status/{}".format(t.user.screen_name, t.id))['html']
             tweetDict['sources'].append(link)
         # tweetDict['sources'].append(t._json['source'])
+
     return tweetDict
 
 

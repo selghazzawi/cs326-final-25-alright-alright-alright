@@ -68,6 +68,15 @@ Logged In Page - Similar to the logged out page but offers the user the opportun
 - Ibrahim Syed: Worked on API routes, crud functionality, connecting frontend to backend.
 - Sam Elghazzawi: Created database class, worked on creating API routes and connecting frontend to backend.
 
+# Grading Rubric
+ ### For the images, it would be best to right click and open them in new tabs because it would be a lot more clear especially with the bar charts.
+ - user login/register - 10% 
+ - Tweet of the day update/rendering - 10%
+ - Analysis/General Analysis graphs creation and rendering - 30% 
+ - Adding/Deleting an interest with X and submit buttons - 30%
+ - Trending topics updating - 20%
+
+
 # Conclusion
 
-    This porject was a challenging one, but I feel like we all learned a lot about web development from it. We learned that web applications have a lot of moving parts and it is very hard to make everything work together properly. An example of this for us was integrating the python script which gathered and processed data from the Twitter api, with the javascript server code. Another challege was doing the twitter analysis itself which took time to optimize and is still a work in progress. Through these challenges I believe all of us have become better engineers and have been able to create something from scratch that is novel and interesting to use. Overall, it was a very rewarding process.
+    This project was a challenging one, but I feel like we all learned a lot about web development from it. We learned that web applications have a lot of moving parts and it is very hard to make everything work together properly. An example of this for us was integrating the python script which gathered and processed data from the Twitter api, with the javascript server code. Another challenge was doing the twitter analysis itself which took time to optimize and is still a work in progress. Through these challenges I believe all of us have become better engineers and have been able to create something from scratch that is novel and interesting to use. Overall, it was a very rewarding process.

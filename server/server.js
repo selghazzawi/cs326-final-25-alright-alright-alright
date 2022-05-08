@@ -9,6 +9,7 @@ import mongoose from 'mongoose';
 import { TheGistDatabase } from './db.js';
 import { createSecureServer } from 'http2';
 import { response } from 'express';
+import path from 'path';
 
 
 //'https://jsonplaceholder.typicode.com/todos/1'
@@ -234,6 +235,11 @@ async function main() {
     
     app.use('/client', express.static('client'));
     
+    // sendFile will go here
+    app.get('/', function(req, res) {
+        console.log('ligma')
+        res.redirect('../client/pages/landingPageLogOut/index.html')
+    });
     //
     //USER ROUTES START\
     app.post('/createUser', async (request, response) => {

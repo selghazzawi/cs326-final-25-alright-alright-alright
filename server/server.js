@@ -289,7 +289,7 @@ async function main() {
             mode: 'text',
             //pythonPath: '/Library/Frameworks/Python.framework/Versions/3.10/bin/python3',
             pythonOptions: ['-u'], // get print results in real-time
-            scriptPath: '/Users/gregorygarber/Desktop/cs326-final-25-alright-alright-alright/server/',
+            scriptPath: 'server/',
             args: [arr]
           };
         PythonShell.run('bigScrape.py', options2, async function(err, results) {

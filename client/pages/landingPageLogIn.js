@@ -64,6 +64,7 @@ async function populateInterests() {
       }
     const json = await crud.getInterests(email);
     let check = 0
+    console.log(json)
       json.forEach(key => {
         if (check < 3) {
             const newDiv = document.createElement('div');

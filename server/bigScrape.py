@@ -102,9 +102,13 @@ def populateTweets(tweetDict, api, count):
     tweets = api.search_tweets(q=tweetDict['q'], lang='en', count=count)
     # print(tweets)
 
-    for t in tweets:
+    for index, t in enumerate(tweets):
         tweetDict['tweets'].append(t.text)
-        tweetDict['sources'].append(t._json['source'])
+        if index == 0:
+            link = api.get_oembed(
+                "https://twitter.com/{}/status/{}".format(t.user.screen_name, t.id))['html']
+            tweetDict['sources'].append(link)
+        # tweetDict['sources'].append(t._json['source'])
     return tweetDict
 
 
@@ -264,7 +268,7 @@ def doBigScrape(userInterests):
     load_dotenv()
 
     returnData = {}
-    api = getTPC(os.environ['BEAR'])
+    api = getTPC(os.environ['BEAR2'])
     trendingDicts = getTop10TrendingDicts(api, USA_WOEID)
     # still need to populate with tweets
     for trend in trendingDicts:
@@ -313,6 +317,8 @@ def bla():
 # bla()
 
 
-# arr = [sys.argv[1], sys.argv[2], sys.argv[3]]
-# doBigScrape(arr)
-doBigScrape(['celtics', 'marcus smart', 'jayson tatum'])
+#arr = [sys.argv[1], sys.argv[2], sys.argv[3]]
+# print(sys.argv[1])
+x = sys.argv[1].split(',')
+doBigScrape(x)
+#doBigScrape(['celtics', 'marcus smart', 'jayson tatum'])

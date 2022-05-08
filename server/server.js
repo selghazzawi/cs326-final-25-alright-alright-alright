@@ -8,6 +8,7 @@ import { PythonShell } from 'python-shell';
 import mongoose from 'mongoose';
 import { TheGistDatabase } from './db.js';
 import { createSecureServer } from 'http2';
+import { response } from 'express';
 
 
 //'https://jsonplaceholder.typicode.com/todos/1'
@@ -209,28 +210,12 @@ async function dumpInterestTopics(response) {
     response.json(interest);
 }
 
-
-/*app.get('*', async (request, response) => {
-    response.status(404).send(`Not found: ${request.path}`);
-});*/
-//const uri = process.env.MONGODB_URI;
-//const client = new MongoClient(uri);
-
 async function listDatabases(client) {
     const databasesList = await client.db().admin().listDatabases();
     
     console.log("Databases:");
     databasesList.databases.forEach(db => console.log(` - ${db.name}`)); 
 }
-
-/*async function createCollection(client) {
-    client.createCollection("testRun", function(err, result) {
-        if (err) throw err;
-        console.log("Collection is created!");
-        // close the connection to db when you are done with it
-
-    });
-}*/
 
 
 
@@ -260,11 +245,12 @@ async function main() {
     app.get('/checkUserLogin', async (request, response) => {
         const options = request.query;
         const res = await db.getUser(options.email);
+        console.log(res)
         if (res[0].password === options.password) {
-            res.status(200).send('successful login');
+            response.status(200).send('successful login');
         }
         else {
-            res.status(500).send('incorrect info');
+            response.status(500).send('incorrect info');
         }
     });
 
@@ -280,39 +266,6 @@ async function main() {
         response.send(rows);
     });
     let dataToSend;
-    app.post('/createInterest', async (request, response) => {
-        const options = request.body;
-        //uid interest i1/2/3
-        //const res = await db.getUser(options.email);
-        // const uid = res[0]._id;
-        // const rows = await db.readInterestsbyId(uid);
-        // if (rows.length >= 3) {
-        //     response.status(500).send(`Max interests: ${rows.length} `);
-        // }
-        //RUN PYTHON SCRIPT
-        const python = spawn('python', ['/Users/gregorygarber/Desktop/cs326-final-25-alright-alright-alright/server/test.py']);
-        //console.log(python)
-        // python.stdout.on('data', function (data) {
-        //     console.log('Pipe data from python script ...');
-        //     //console.log(1, data)
-        //     dataToSend = data.toString();
-        //     console.log(dataToSend)
-        //    });
-        //    python.on('close', (code) => {
-        //     console.log(`child process close all stdio with code ${code}`);
-        //     response.send(dataToSend)
-        //     // send data to browser
-        //     });
-
-        PythonShell.run('/Users/gregorygarber/Desktop/cs326-final-25-alright-alright-alright/server/bigScrape.py', null, function(err, results) {
-            if (err) throw err;
-            const res = JSON.parse(results)
-            console.log(res.generalAnalysis);
-            //'generalAnalysis', 'trendingAnalysis', 'userAnalysis', 'TOD'
-        })
-        //await db.InsertInterest(uid, pythonData.interest, pythonData.image1, pythonData.image2, pythonData.image3)
-        //response.status(200).send('success');
-    });
 
     app.post('/createInterestAndTrending', async (req, res) => {
         //get options from req, check for length
@@ -331,10 +284,11 @@ async function main() {
             //pythonPath: '/Library/Frameworks/Python.framework/Versions/3.10/bin/python3',
             pythonOptions: ['-u'], // get print results in real-time
             scriptPath: '/Users/gregorygarber/Desktop/cs326-final-25-alright-alright-alright/server/',
-            args: [arr[0], arr[1], arr[2]]
+            args: [arr]
           };
         PythonShell.run('bigScrape.py', options2, async function(err, results) {
             if (err) throw err;
+            console.log(results)
             const res2 = JSON.parse(results)
             const generalAnalysis = res2.generalAnalysis;
             const trendingAnalysis = res2.trendingAnalysis;
@@ -395,64 +349,18 @@ async function main() {
         response.status(200).send('success');
     });
 
-    // ----------------------------------------------------------------routes below are gonna get deleted eventually
-    
-    app.post('/createTrending', async (request, response) => {
-        const options = request.body;
-        createTrendingTopic(response, options.name);
-    });
-    
-    
-    
-    app.put('/updateTrending', async (request, response) => {
-        const options = request.query;
-        updateTrendingTopic(response, options.name, options.analysis);
-    });
-    
-    app.put('/updateInterest', async (request, response) => {
-        const options = request.query;
-        updateInterestTopic(response, options.name, options.analysis);
-    });
-    
-    app.delete('/deleteTrending', async (request, response) => {
-        const options = request.query;
-        deleteTrendingTopic(response, options.name);
-    });
-    
-    app.delete('/deleteInterest', async (request, response) => {
-        const options = request.query;
-        deleteInterestTopic(response, options.name);
-    });
-    
-    
-    app.get('/dumpTrending', async (request, response) => {
-        const options = request.body;
-        dumpTrendingTopics(response);
-    });
-    
-    app.get('/dumpInterest', async (request, response) => {
-        const options = request.body;
-        dumpInterestTopics(response);
-    });
-
     app.get('/getTOD', async (request, response) => {
         const rows = await db.readTOD();
         response.send(rows);
     });
-    //console.log(uri)
-    //const client = new MongoClient(uri);
-    try {
-        /*const client = new TheGistDatabase(uri);
-        await client.connect();
-        await client.InsertInterest(1,'celtics', 'i1', 'i2', 'i3', 'meta');
-        console.log(await client.readInterestsbyId(1));
-        */
 
-
-    }
-    catch (e) {
-        console.error(e);
-    }
+    app.delete('/deleteInterest', async (request, response) => {
+        const options = request.query;
+        const userRes = await db.getUser(options.email);
+        const id = userRes[0]._id;
+        await db.deleteInterest(id, options.interest)
+        response.status(200).send('success')
+    })
     app.listen(port, () => {
         console.log(`Server started on port ${port}`);
       });

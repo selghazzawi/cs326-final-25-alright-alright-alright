@@ -9,7 +9,7 @@ const searchBar = document.getElementById('search-bar')
 const submitButton = document.getElementById('submit-button')
 const tweet = document.getElementById('tweet-box')
 
-let email = 'jeff@ligma.com'//updates once user logs in
+let email = JSON.parse(window.localStorage.getItem('email'))//updates once user logs in
 
 // async function populateTrending() {
 //     while (trendingBox.firstChild) {
@@ -32,6 +32,10 @@ let email = 'jeff@ligma.com'//updates once user logs in
 //         else break;
 //     } 
 // }
+
+document.getElementById('logOut').addEventListener('click', () => {
+    location.href = 'http://localhost:8080/client/pages/login/'
+})
 
 async function populateTrending() {
     while (trendingBox.firstChild) {
@@ -63,9 +67,17 @@ async function populateInterests() {
       json.forEach(key => {
         if (check < 3) {
             const newDiv = document.createElement('div');
-            newDiv.innerHTML = key.interest;
+            const text = document.createElement('div');
+            const x = document.createElement('div');
+            x.innerHTML = 'x'
+            x.onclick = function() {deleteInterest(text.innerHTML)}
+            text.innerHTML = key.interest;
+            text.onclick = function() {displayNewAnalysis(key)};
+            newDiv.appendChild(text)
+            newDiv.appendChild(x)
+            newDiv.style.display = 'flex'
+            newDiv.style.justifyContent = 'space-between'
             newDiv.classList.add('interest-tag');
-            newDiv.onclick = function() {displayNewAnalysis(key)};
             interestBox.appendChild(newDiv);
             check += 1
         }
@@ -86,17 +98,9 @@ async function populateGenAnalysis() {
 }
 
 async function populateTweet() {
-    // const name = document.getElementById('name');
-    // const handle = document.getElementById('handle')
-    // const text = document.getElementById('tweet-text');
-    // const img = document.getElementById('tweet-img');
-
-    // name.innerHTML = tweet.user_name;
-    // handle.innerHTML = tweet.user_handle;
-    // text.innerHTML = tweet.text;
-    // img.innerHTML = "<img id='img' src='" + tweet.img + "' alt='Bruce-Willis picture'></img>"
     const json = await crud.getTOD()
-    console.log(json)
+    const resTweet = json[0].link
+    tweet.innerHTML = resTweet
 }
 
 function initialAnalysis(obj) {
@@ -117,11 +121,6 @@ function initialAnalysis(obj) {
     analysisBox1.appendChild(image3);
     image3.style.height = '100%'
     image3.style.width = '100%'
-
-
-    // analysisBox1.innerHTML = "<img src='" + obj.image1 + "' alt='image1'>"
-    // analysisBox2.innerHTML = "<img src='" + obj.image2 + "' alt='image2'>"
-    // analysisBox3.innerHTML = "<img src='" + obj.image3 + "' alt='image3'>"
 }
 
 function displayNewAnalysis(obj) {
@@ -148,18 +147,20 @@ function displayNewAnalysis(obj) {
     image3.style.width = '100%'
 }
 
-async function deleteInterest(name) {
-    await crud.deleteInterestTopic(name)
-    populateInterests();
+
+async function deleteInterest(interest) {
+    await crud.deleteInterestTopic(email, interest)
+    await populateInterests();
 }
 
 submitButton.addEventListener('click', async function() {
-    console.log(interestBox.children)
     let arr = []
-
-    for (let i = 0; i < interestBox.children.length; i++) {
-        arr.push(interestBox.children[i].innerHTML)
+    if (interestBox.firstChild) {
+        for (let i = 0; i < interestBox.children.length; i++) {
+            arr.push(interestBox.children[i].children[0].innerHTML)
+        }
     }
+    if (searchBar.value === '') {return}
     arr.push(searchBar.value)
     try {
     const data = await crud.createInterestTopic(email, arr)
@@ -167,14 +168,10 @@ submitButton.addEventListener('click', async function() {
     populateInterests();
     populateGenAnalysis();
     populateTweet();
-    console.log('poop')
     } catch (err) {
-        console.log(err)
+        alert(err)
     }
 })
-
-
-// getAllTrendingTweets()
 populateTrending();
 populateInterests();
 populateGenAnalysis();

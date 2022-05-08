@@ -9,7 +9,7 @@
   },
   "scripts": {
     "deploy": "copyfiles ../../client/* ../server/* .env package*.json deploy",
-    "start": "node server/server.js",
+    "start": "nodemon server/server.js",
     "debug": "node --inspect-brk server/server.js"
   },
   "author": "",
@@ -20,8 +20,9 @@
     "mongodb": "^4.5.0",
     "mongoose": "^6.3.1",
     "morgan": "^1.10.0",
-    "nodemon": "^2.0.15",
-    "pg": "^8.7.3"
+    "nodemon": "^2.0.16",
+    "pg": "^8.7.3",
+    "python-shell": "^3.0.1"
   },
   "devDependencies": {
     "copyfiles": "^2.4.1"

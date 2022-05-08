@@ -4,9 +4,12 @@ import { readFile, writeFile } from 'fs/promises';
 import { MongoClient } from 'mongodb';
 import 'dotenv/config';
 import { spawn } from 'child_process';
+import { PythonShell } from 'python-shell';
 import mongoose from 'mongoose';
 import { TheGistDatabase } from './db.js';
 import { createSecureServer } from 'http2';
+import { response } from 'express';
+
 
 //'https://jsonplaceholder.typicode.com/todos/1'
 const fakeTrendingData = 'server/fakeTrendingData.json';
@@ -207,13 +210,6 @@ async function dumpInterestTopics(response) {
     response.json(interest);
 }
 
-
-/*app.get('*', async (request, response) => {
-    response.status(404).send(`Not found: ${request.path}`);
-});*/
-//const uri = process.env.MONGODB_URI;
-//const client = new MongoClient(uri);
-
 async function listDatabases(client) {
     const databasesList = await client.db().admin().listDatabases();
     
@@ -221,21 +217,12 @@ async function listDatabases(client) {
     databasesList.databases.forEach(db => console.log(` - ${db.name}`)); 
 }
 
-/*async function createCollection(client) {
-    client.createCollection("testRun", function(err, result) {
-        if (err) throw err;
-        console.log("Collection is created!");
-        // close the connection to db when you are done with it
-
-    });
-}*/
-
 
 
 async function main() {
     const app = express();
-    const port = 3000;
-    
+    const port = 8080;
+    const uri = process.env.MONGODB_URI;
     const db = new TheGistDatabase(uri);
     await db.connect();
 
@@ -258,11 +245,12 @@ async function main() {
     app.get('/checkUserLogin', async (request, response) => {
         const options = request.query;
         const res = await db.getUser(options.email);
+        console.log(res)
         if (res[0].password === options.password) {
-            res.status(200).send('successful login');
+            response.status(200).send('successful login');
         }
         else {
-            res.status(500).send('incorrect info');
+            response.status(500).send('incorrect info');
         }
     });
 
@@ -277,20 +265,60 @@ async function main() {
         const rows = await db.readInterestsbyId(uid);
         response.send(rows);
     });
+    let dataToSend;
 
-    app.post('/createInterest', async (request, response) => {
-        const options = request.body;
-        //uid interest i1/2/3
-        const res = await db.getUser(options.email);
-        const uid = res[0]._id;
-        const rows = await db.readInterestsbyId(uid);
-        if (rows.length >= 3) {
-            response.status(500).send(`Max interests: ${rows.length} `);
+    app.post('/createInterestAndTrending', async (req, res) => {
+        //get options from req, check for length
+        //run the script break it down into variables and then delete/update/post to db
+        const options = req.body;
+        const arr = options.args
+        const email = options.email
+        const userRes = await db.getUser(options.email);
+        const id = userRes[0]._id;
+        console.log('check2')
+        if (arr.length > 3) {
+            res.status(500).send('incorrect info');
         }
-        //RUN PYTHON SCRIPT
-        //await db.InsertInterest(uid, pythonData.interest, pythonData.image1, pythonData.image2, pythonData.image3)
-        response.status(200).send('success');
-    });
+        let options2 = {
+            mode: 'text',
+            //pythonPath: '/Library/Frameworks/Python.framework/Versions/3.10/bin/python3',
+            pythonOptions: ['-u'], // get print results in real-time
+            scriptPath: '/Users/gregorygarber/Desktop/cs326-final-25-alright-alright-alright/server/',
+            args: [arr]
+          };
+        PythonShell.run('bigScrape.py', options2, async function(err, results) {
+            if (err) throw err;
+            console.log(results)
+            const res2 = JSON.parse(results)
+            const generalAnalysis = res2.generalAnalysis;
+            const trendingAnalysis = res2.trendingAnalysis;
+            const userAnalysis = res2.userAnalysis;
+            const TOD = res2.TOD;
+            //console.log(userAnalysis)
+            console.log(Object.keys(generalAnalysis))
+            //'generalAnalysis', 'trendingAnalysis', 'userAnalysis', 'TOD'
+            
+            await db.deleteAllInterests(id);
+            await userAnalysis.forEach(async (interest) => {
+                await db.InsertInterest(id, interest.topic, interest.sentiment, interest.topWords, interest.orgs);
+            })
+
+            await db.deleteAllTrendingTopics();
+            trendingAnalysis.forEach(async (trending) => {
+                await db.InsertTrendingTopic(trending.topic, trending.sentiment, trending.topWords, trending.orgs);
+            })
+
+            await db.deleteTrendingAnalysis()
+            await db.insertTrendingAnalysis(generalAnalysis)
+
+            await db.deleteTOD()
+            await db.insertTOD(TOD)
+            res.status(200).send('success');
+
+           // console.log(1, generalAnalysis, 2, trendingAnalysis, 3, userAnalysis, 4, TOD)
+        })
+        console.log('ligma')
+    })
     //
     //TRENDING ROUTES
     app.get('/readTrending', async (request, response) => {
@@ -310,7 +338,6 @@ async function main() {
     //TODO: Tweet of the Day Routes
     //GEN TRENDING ROUTES
     app.get('/readTrendingAnalysis', async (request, response) => {
-        const options = request.query;
         const rows = await db.readTrendingAnalysis();
         response.send(rows);
     });
@@ -322,61 +349,18 @@ async function main() {
         response.status(200).send('success');
     });
 
-    // ----------------------------------------------------------------routes below are gonna get deleted eventually
-    
-    app.post('/createTrending', async (request, response) => {
-        const options = request.body;
-        createTrendingTopic(response, options.name);
+    app.get('/getTOD', async (request, response) => {
+        const rows = await db.readTOD();
+        response.send(rows);
     });
-    
-    
-    
-    app.put('/updateTrending', async (request, response) => {
-        const options = request.query;
-        updateTrendingTopic(response, options.name, options.analysis);
-    });
-    
-    app.put('/updateInterest', async (request, response) => {
-        const options = request.query;
-        updateInterestTopic(response, options.name, options.analysis);
-    });
-    
-    app.delete('/deleteTrending', async (request, response) => {
-        const options = request.query;
-        deleteTrendingTopic(response, options.name);
-    });
-    
+
     app.delete('/deleteInterest', async (request, response) => {
         const options = request.query;
-        deleteInterestTopic(response, options.name);
-    });
-    
-    
-    app.get('/dumpTrending', async (request, response) => {
-        const options = request.body;
-        dumpTrendingTopics(response);
-    });
-    
-    app.get('/dumpInterest', async (request, response) => {
-        const options = request.body;
-        dumpInterestTopics(response);
-    });
-
-    const uri = process.env.MONGODB_URI;
-    //console.log(uri)
-    //const client = new MongoClient(uri);
-    try {
-        /*const client = new TheGistDatabase(uri);
-        await client.connect();
-        await client.InsertInterest(1,'celtics', 'i1', 'i2', 'i3', 'meta');
-        console.log(await client.readInterestsbyId(1));
-        */
-
-
-    }
-    catch (e) {
-        console.error(e);
-    }
+        const userRes = await db.getUser(options.email);
+        const id = userRes[0]._id;
+        await db.deleteInterest(id, options.interest)
+        response.status(200).send('success')
+    })
     app.listen(port, () => {
         console.log(`Server started on port ${port}`);
       });

@@ -22,9 +22,7 @@ export class TheGistDatabase {
     }
     async init() {
         this.db = this.client.db('theGistMainApp');
-        //console.log(this.db);
         this.interests = this.db.collection('Interests');
-        //console.log(this.interests);
         this.trendingTopics = this.db.collection('TrendingTopics');
         this.users = this.db.collection('Users');
         this.trendingAnalysis = this.db.collection('TrendingAnalysis');

@@ -73,9 +73,22 @@
       const response = await fetch(`/checkUserLogin?email=${email}&password=${password}`, {
         method: 'GET',
       });
-      const data = await response.json();
+      const data = response;
       return data;
     } catch (err) {
+      return err
+    }
+  }
+
+  export async function checkUserExist(email) {
+    try {
+      const response = await fetch(`/checkUserExist?email=${email}`, {
+        method: 'GET',
+      });
+      const data = response
+      return data;
+    } catch (err) {
+      console.log(err)
       return err
     }
   }
@@ -88,7 +101,7 @@
       },
       body: JSON.stringify({ email: email, password: password }),
     });
-    const data = await response.json();
+    const data = await response;
     return data;
   }
 

@@ -34,8 +34,14 @@ let email = JSON.parse(window.localStorage.getItem('email'))//updates once user 
 // }
 
 document.getElementById('logOut').addEventListener('click', () => {
-    location.href = 'http://localhost:8080/client/pages/login/'
+    location.href = 'http://localhost:8080/client/pages/landingPageLogOut/'
 })
+
+function removeAllChildNodes(parent) {
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
+    }
+}
 
 async function populateTrending() {
     while (trendingBox.firstChild) {
@@ -64,7 +70,7 @@ async function populateInterests() {
       }
     const json = await crud.getInterests(email);
     let check = 0
-    console.log(json)
+    
       json.forEach(key => {
         if (check < 3) {
             const newDiv = document.createElement('div');
@@ -105,6 +111,13 @@ async function populateTweet() {
 }
 
 function initialAnalysis(obj) {
+
+    if (analysisBox1.firstChild) {
+        analysisBox1.removeChild(analysisBox1.lastChild);
+        analysisBox2.removeChild(analysisBox2.lastChild);
+        analysisBox3.removeChild(analysisBox3.lastChild);
+    }
+
     const image1 = new Image();
     image1.src = `data:image/png;base64,${obj.image1.substring(2, obj.image1.length - 1)}`;
     analysisBox3.appendChild(image1);
@@ -125,9 +138,9 @@ function initialAnalysis(obj) {
 }
 
 function displayNewAnalysis(obj) {
-    analysisBox1.removeChild(analysisBox1.lastChild)
-    analysisBox2.removeChild(analysisBox2.lastChild)
-    analysisBox3.removeChild(analysisBox3.lastChild)
+    removeAllChildNodes(analysisBox1);
+    removeAllChildNodes(analysisBox2);
+    removeAllChildNodes(analysisBox3);
 
     const image1 = new Image();
     image1.src = `data:image/png;base64,${obj.image1.substring(2, obj.image1.length - 1)}`;
@@ -154,6 +167,10 @@ async function deleteInterest(interest) {
     await populateInterests();
 }
 
+async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 submitButton.addEventListener('click', async function() {
     let arr = []
     if (interestBox.firstChild) {
@@ -164,15 +181,20 @@ submitButton.addEventListener('click', async function() {
     if (searchBar.value === '') {return}
     arr.push(searchBar.value)
     try {
-    const data = await crud.createInterestTopic(email, arr)
-    populateTrending();
-    populateInterests();
-    populateGenAnalysis();
-    populateTweet();
+    alert("Script is running, please do not click submit again and your interest will be added in a few minutes.");
+    const data = await crud.createInterestTopic(email, arr);
+    //Set a timeout for 4 minutes
+    await sleep(240000);
+    await populateTrending();
+    await populateInterests();
+    await populateGenAnalysis();
+    await populateTweet();
     } catch (err) {
         alert(err)
     }
 })
+
+
 populateTrending();
 populateInterests();
 populateGenAnalysis();

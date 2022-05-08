@@ -48,7 +48,6 @@ readTrendingButton.addEventListener('click', async (e) => {
 });
 
 readInterestButton.addEventListener('click', async (e) => {
-  console.log('butt')
   const name = nameText.value;
   const json = await crud.readInterestTopic(name);
   output.innerHTML = JSON.stringify(json);

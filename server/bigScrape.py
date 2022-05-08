@@ -9,7 +9,7 @@ from nltk.stem.snowball import SnowballStemmer
 from dotenv import load_dotenv
 from nltk.stem import SnowballStemmer
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-from PIL import Image
+# from PIL import Image
 import re
 import base64
 from collections import UserDict

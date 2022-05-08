@@ -5,7 +5,6 @@ const email = document.getElementById('form3Example3cg')
 const password1 = document.getElementById('form3Example4cg')
 const password2 = document.getElementById('form3Example4cdg')
 
-console.log('hi')
 
 signup.addEventListener('click', async () => {
     if (name1.value === '' || email.value === '' || password1.value === '' || password2.value === '') {

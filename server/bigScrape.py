@@ -104,7 +104,7 @@ def populateTweets(tweetDict, api, count):
 
     for t in tweets:
         tweetDict['tweets'].append(t.text)
-        tweetDict['sources'].append(t.source)
+        tweetDict['sources'].append(t._json['source'])
     return tweetDict
 
 
@@ -112,6 +112,7 @@ def populateTweets(tweetDict, api, count):
 
 
 def getTopicAnalysis(plt, trendDict):
+    plt.clf()
     # plt.rcParams['font.size'] = 10
     # plt.rcParams["font.monospace"] = ["DejaVu Sans Mono"]
     # plt.rcParams["font.family"] = "monospace"
@@ -148,6 +149,7 @@ def getTopicAnalysis(plt, trendDict):
     # plt.show()
     b64plt = plotToB64(plt)
     analysis['sentiment'] = str(b64plt)
+    plt.clf()
     # nltk.download('stopwords')
     # done sentiment
     stemmer = SnowballStemmer(language='english')
@@ -214,7 +216,7 @@ def getTopicAnalysis(plt, trendDict):
     # plt.show()
     b64plt = plotToB64(plt)
     analysis['topWords'] = str(b64plt)
-
+    plt.clf()
     # end top wrods
     # spacy download en_core_web_sm
     nlp = spacy.load("en_core_web_sm")
@@ -251,7 +253,7 @@ def getTopicAnalysis(plt, trendDict):
 
     b64plt = plotToB64(plt)
     analysis['orgs'] = str(b64plt)
-
+    plt.clf()
     return analysis
 
 # def getTweetOfTheDay(topTrendQuery):

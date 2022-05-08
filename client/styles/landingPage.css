@@ -123,6 +123,7 @@
   border-top: 1px solid rgb(56, 1, 100);
   border-bottom: 1px solid rgb(56, 1, 100);
   color: rgb(33, 0, 83);
+  cursor: pointer;
 }
 
 .interest-tag {
@@ -132,6 +133,7 @@
   border-top: 1px solid rgb(56, 1, 100);
   border-bottom: 1px solid rgb(56, 1, 100);
   color: rgb(33, 0, 83);
+  cursor: pointer;
 }
 
 #tweet-box {

@@ -321,7 +321,11 @@ async function main() {
         const arr = options.args
         const email = options.email
         const userRes = await db.getUser(options.email);
-        const id = res[0]._id;
+        const id = userRes[0]._id;
+        console.log('check2')
+        if (arr.length > 3) {
+            res.status(500).send('incorrect info');
+        }
         let options2 = {
             mode: 'text',
             //pythonPath: '/Library/Frameworks/Python.framework/Versions/3.10/bin/python3',
@@ -329,24 +333,24 @@ async function main() {
             scriptPath: '/Users/gregorygarber/Desktop/cs326-final-25-alright-alright-alright/server/',
             args: [arr[0], arr[1], arr[2]]
           };
-        PythonShell.run('bigScrape.py', options2, function(err, results) {
+        PythonShell.run('bigScrape.py', options2, async function(err, results) {
             if (err) throw err;
-            const res = JSON.parse(results)
-            const generalAnalysis = res.generalAnalysis;
-            const trendingAnalysis = res.trendingAnalysis;
-            const userAnalysis = res.userAnalysis;
-            const TOD = res.TOD;
+            const res2 = JSON.parse(results)
+            const generalAnalysis = res2.generalAnalysis;
+            const trendingAnalysis = res2.trendingAnalysis;
+            const userAnalysis = res2.userAnalysis;
+            const TOD = res2.TOD;
             //console.log(userAnalysis)
             console.log(Object.keys(generalAnalysis))
             //'generalAnalysis', 'trendingAnalysis', 'userAnalysis', 'TOD'
             
             await db.deleteAllInterests(id);
-            userAnalysis.forEach(interest => {
+            await userAnalysis.forEach(async (interest) => {
                 await db.InsertInterest(id, interest.topic, interest.sentiment, interest.topWords, interest.orgs);
             })
 
             await db.deleteAllTrendingTopics();
-            trendingAnalysis.forEach(trending => {
+            trendingAnalysis.forEach(async (trending) => {
                 await db.InsertTrendingTopic(trending.topic, trending.sentiment, trending.topWords, trending.orgs);
             })
 
@@ -355,7 +359,7 @@ async function main() {
 
             await db.deleteTOD()
             await db.insertTOD(TOD)
-            response.status(200).send('success');
+            res.status(200).send('success');
 
            // console.log(1, generalAnalysis, 2, trendingAnalysis, 3, userAnalysis, 4, TOD)
         })
@@ -380,7 +384,6 @@ async function main() {
     //TODO: Tweet of the Day Routes
     //GEN TRENDING ROUTES
     app.get('/readTrendingAnalysis', async (request, response) => {
-        const options = request.query;
         const rows = await db.readTrendingAnalysis();
         response.send(rows);
     });
@@ -430,6 +433,11 @@ async function main() {
     app.get('/dumpInterest', async (request, response) => {
         const options = request.body;
         dumpInterestTopics(response);
+    });
+
+    app.get('/getTOD', async (request, response) => {
+        const rows = await db.readTOD();
+        response.send(rows);
     });
     //console.log(uri)
     //const client = new MongoClient(uri);

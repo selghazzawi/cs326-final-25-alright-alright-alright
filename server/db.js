@@ -125,11 +125,11 @@ export class TheGistDatabase {
     }
 
     async insertTrendingAnalysis(image) {
-        await this.users.insertOne({'image': image});
+        await this.trendingAnalysis.insertOne({'image': image});
     }
 
     async readTrendingAnalysis() {
-        return await this.users.find({}).toArray();
+        return await this.trendingAnalysis.find({}).toArray();
     }
     //TODO: Tweet of the Day Routes
     async deleteTOD() {
